@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Python_Project_Creator": {
+      "commandName": "Project",
+      "commandLineArgs": "testpath"
+    }
+  }
+}
