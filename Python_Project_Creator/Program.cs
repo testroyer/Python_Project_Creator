@@ -3,6 +3,7 @@ using Python_Project_Creator;
 
 
 string origin_project_path = "";
+string def_package_folder_name = "package";
 
 //Create a json file for preferences
 
@@ -40,6 +41,11 @@ if (args.Length > 0)
         Console.WriteLine($"New path changed to: {json.PythonPath}");
         Environment.Exit(0);
         
+    }
+
+    if (args.Length == 3 && args[1] == "-p")
+    {
+        def_package_folder_name = args[2];
     }
 }
 
@@ -80,7 +86,7 @@ async Task<int> CreateNewFile(string filename)
             }
             if (filename == "main.py")
             {
-                await fs.WriteAsync("import json\nimport packages.package\n\ndef main():\n    with open(\"./json /data.json\" , \"r\") as f:\n        data = json.load(f)\n\n\nif __name__ == '__main__':\n    main()");
+                await fs.WriteAsync($"import json\nimport packages.{def_package_folder_name}\n\ndef main():\n    with open(\"./json /data.json\" , \"r\") as f:\n        data = json.load(f)\n\n\nif __name__ == '__main__':\n    main()");
             }
         }
     }
@@ -102,7 +108,7 @@ try
     new_project_path = Path.Combine(origin_project_path, "packages");
     Directory.CreateDirectory(new_project_path);
     await CreateNewFile("__init__.py");
-    await CreateNewFile("package.py");
+    await CreateNewFile((def_package_folder_name+".py"));
 
 
 }
