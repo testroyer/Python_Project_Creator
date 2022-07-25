@@ -29,8 +29,7 @@ if (args.Length > 0)
         Console.WriteLine($"Project path: {pyfolder}");
         Environment.Exit(0);
     }
-
-    if (args.Length == 2 && args[0] == "--projectpath")
+    else if (args.Length == 2 && args[0] == "--projectpath")
     {
         json!.PythonPath = args[1];
         string jsonString = JsonSerializer.Serialize(json);
@@ -40,10 +39,13 @@ if (args.Length > 0)
         }
         Console.WriteLine($"New path changed to: {json.PythonPath}");
         Environment.Exit(0);
-        
-    }
 
-    if (args.Length == 3 && args[1] == "-p")
+    }
+    else if (args.Length == 3 && args[1] == "--projectpath")
+    {
+        pyfolder = args[2];
+    }
+    else if (args.Length == 3 && args[1] == "-p")
     {
         def_package_folder_name = args[2];
     }
