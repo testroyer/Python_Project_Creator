@@ -23,6 +23,29 @@ string pyfolder = json!.PythonPath!;
 
 if (args.Length > 0)
 {
+    if (args.ToList().Contains("and"))
+    {
+        string[] args1 = args.Skip(1).Take(2).ToArray();
+        string[] args2 = args.Skip(4).Take(2).ToArray();
+        List<string[]> argarr = new List<string[]>()
+        {
+            args1, args2
+        };
+        foreach (string[] arg in argarr)
+        {
+            if (arg[0] == "--projectpath")
+            {
+                pyfolder = arg[1];
+            }
+            if (arg[0] == "-p")
+            {
+                def_package_folder_name = arg[1];
+            }
+        }
+        goto ProjectName;
+
+    }
+
     if (args.Length == 1 && args[0] == "--projectpath")
     {
 
@@ -51,6 +74,7 @@ if (args.Length > 0)
     }
 }
 
+ProjectName:
 // {"PythonPath" : "C:\users\"}
 
 var project_name = args.AsQueryable().FirstOrDefault();
