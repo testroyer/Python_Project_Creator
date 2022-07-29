@@ -23,28 +23,42 @@ string pyfolder = json!.PythonPath!;
 
 if (args.Length > 0)
 {
-    if (args.ToList().Contains("and"))
+    List<string> arr = args.ToList();
+    if (arr.Contains("and"))
     {
-        string[] args1 = args.Skip(1).Take(2).ToArray();
-        string[] args2 = args.Skip(4).Take(2).ToArray();
-        List<string[]> argarr = new List<string[]>()
+        int left = 1;
+        int right = 1;
+        List<List<string>> comandarg = new List<List<string>>();
+        while (right < arr.Count)
         {
-            args1, args2
-        };
-        foreach (string[] arg in argarr)
-        {
-            if (arg[0] == "--projectpath")
+            if (right == arr.Count - 1)
+                comandarg.Add(arr.Skip(left).Take((right + 1) - left).ToList());
+            if (arr[right] == "and")
             {
-                pyfolder = arg[1];
+                comandarg.Add(arr.Skip(left).Take(right - left).ToList());
+                left = right;
+                left++;
+                right++;
+                continue;
             }
-            if (arg[0] == "-p")
+            right++;
+        }
+        foreach (List<string> commands in comandarg)
+        {
+            if (commands[0] == "--projectpath")
             {
-                def_package_folder_name = arg[1];
+                pyfolder = commands[1];
+            }
+            else if (commands[0] == "-p")
+            {
+                def_package_folder_name = commands[1];  
             }
         }
-        goto ProjectName;
 
+        goto ProjectName;
     }
+
+
 
     if (args.Length == 1 && args[0] == "--projectpath")
     {
