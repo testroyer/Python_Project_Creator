@@ -4,6 +4,8 @@ using Python_Project_Creator;
 
 string origin_project_path = "";
 string def_package_folder_name = "package";
+string def_json_name = "data.json";
+
 
 //Create a json file for preferences
 
@@ -23,68 +25,99 @@ string pyfolder = json!.PythonPath!;
 
 if (args.Length > 0)
 {
-    List<string> arr = args.ToList();
-    if (arr.Contains("and"))
+    try
     {
-        int left = 1;
-        int right = 1;
-        List<List<string>> comandarg = new List<List<string>>();
-        while (right < arr.Count)
+
+    
+        List<string> arr = args.ToList();
+        if (arr.Contains("and"))
         {
-            if (right == arr.Count - 1)
-                comandarg.Add(arr.Skip(left).Take((right + 1) - left).ToList());
-            if (arr[right] == "and")
+            int left = 1;
+            int right = 1;
+            List<List<string>> comandarg = new List<List<string>>();
+            while (right < arr.Count)
             {
-                comandarg.Add(arr.Skip(left).Take(right - left).ToList());
-                left = right;
-                left++;
+                if (right == arr.Count - 1)
+                    comandarg.Add(arr.Skip(left).Take((right + 1) - left).ToList());
+                if (arr[right] == "and")
+                {
+                    comandarg.Add(arr.Skip(left).Take(right - left).ToList());
+                    left = right;
+                    left++;
+                    right++;
+                    continue;
+                }
                 right++;
-                continue;
             }
-            right++;
-        }
-        foreach (List<string> commands in comandarg)
-        {
-            if (commands[0] == "--projectpath")
+            foreach (List<string> commands in comandarg)
             {
-                pyfolder = commands[1];
+                if (commands[0] == "--projectpath")
+                {
+                    pyfolder = commands[1];
+                }
+                else if (commands[0] == "-p")
+                {
+                    def_package_folder_name = commands[1];  
+                }
+                else if (commands[0] == "-json")
+                {
+                    if (commands[1].EndsWith(".json"))
+                    {
+                        def_json_name = commands[1];
+                    }
+                    else
+                    {
+                        def_json_name = commands[1] + ".json";
+                    }
+                }
             }
-            else if (commands[0] == "-p")
-            {
-                def_package_folder_name = commands[1];  
-            }
+
+            goto ProjectName;
         }
 
-        goto ProjectName;
-    }
 
 
-
-    if (args.Length == 1 && args[0] == "--projectpath")
-    {
-
-        Console.WriteLine($"Project path: {pyfolder}");
-        Environment.Exit(0);
-    }
-    else if (args.Length == 2 && args[0] == "--projectpath")
-    {
-        json!.PythonPath = args[1];
-        string jsonString = JsonSerializer.Serialize(json);
-        using (StreamWriter sw = new StreamWriter(File.OpenWrite(".\\pref.json")))
+        if (args.Length == 1 && args[0] == "--projectpath")
         {
-            sw.Write(jsonString);
-        }
-        Console.WriteLine($"New path changed to: {json.PythonPath}");
-        Environment.Exit(0);
 
-    }
-    else if (args.Length == 3 && args[1] == "--projectpath")
+            Console.WriteLine($"Project path: {pyfolder}");
+            Environment.Exit(0);
+        }
+        else if (args.Length == 2 && args[0] == "--projectpath")
+        {
+            json!.PythonPath = args[1];
+            string jsonString = JsonSerializer.Serialize(json);
+            using (StreamWriter sw = new StreamWriter(File.OpenWrite(".\\pref.json")))
+            {
+                sw.Write(jsonString);
+            }
+            Console.WriteLine($"New path changed to: {json.PythonPath}");
+            Environment.Exit(0);
+
+        }
+        else if (args.Length == 3 && args[1] == "--projectpath")
+        {
+            pyfolder = args[2];
+        }
+        else if (args.Length == 3 && args[1] == "-p")
+        {
+            def_package_folder_name = args[2];
+        }
+        else if (args.Length == 3 && args[1] == "-json")
+        {
+            if (args[1].EndsWith(".json"))
+            {
+                def_json_name = args[2];
+            }
+            else
+            {
+                def_json_name = args[2] + ".json";
+            }
+        }
+    }catch (Exception e)
     {
-        pyfolder = args[2];
-    }
-    else if (args.Length == 3 && args[1] == "-p")
-    {
-        def_package_folder_name = args[2];
+        Console.WriteLine(e.Message);
+        Environment.Exit(1);
     }
 }
 
@@ -120,13 +153,13 @@ async Task<int> CreateNewFile(string filename)
     {
         using (StreamWriter fs = new StreamWriter(File.Create(Path.Combine(new_project_path, filename))))
         {
-            if (filename == "data.json")
+            if (filename == def_json_name)
             {
                 await fs.WriteAsync("{\n\n}");
             }
             if (filename == "main.py")
             {
-                await fs.WriteAsync($"import json\nimport packages.{def_package_folder_name}\n\ndef main():\n    with open(\"./json/data.json\" , \"r\") as f:\n        data = json.load(f)\n\n\nif __name__ == '__main__':\n    main()");
+                await fs.WriteAsync($"import json\nimport packages.{def_package_folder_name}\n\ndef main():\n    with open(\"./json/{def_json_name}\" , \"r\") as f:\n        data = json.load(f)\n\n\nif __name__ == '__main__':\n    main()");
             }
         }
     }
@@ -144,7 +177,7 @@ try
     await CreateNewFile("main.py");
     new_project_path = Path.Combine(origin_project_path, "json");
     Directory.CreateDirectory(new_project_path);
-    await CreateNewFile("data.json");
+    await CreateNewFile(def_json_name);
     new_project_path = Path.Combine(origin_project_path, "packages");
     Directory.CreateDirectory(new_project_path);
     await CreateNewFile("__init__.py");
