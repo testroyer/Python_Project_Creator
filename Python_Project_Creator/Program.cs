@@ -126,7 +126,7 @@ async Task<int> CreateNewFile(string filename)
             }
             if (filename == "main.py")
             {
-                await fs.WriteAsync($"import json\nimport packages.{def_package_folder_name}\n\ndef main():\n    with open(\"./json /data.json\" , \"r\") as f:\n        data = json.load(f)\n\n\nif __name__ == '__main__':\n    main()");
+                await fs.WriteAsync($"import json\nimport packages.{def_package_folder_name}\n\ndef main():\n    with open(\"./json/data.json\" , \"r\") as f:\n        data = json.load(f)\n\n\nif __name__ == '__main__':\n    main()");
             }
         }
     }
