@@ -8,16 +8,19 @@ string def_json_name = "data.json";
 
 
 //Create a json file for preferences
+string currrent_directory = Directory.GetCurrentDirectory();
+string[] current_directory_array = currrent_directory.Split('\\');
+string current_user_directory = current_directory_array[2];
 
-
-if (!File.Exists(@".\pref.json"))
+if (!File.Exists(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.json"))
 {
-    using (StreamWriter sw = new StreamWriter(File.Create(".\\pref.json")))
+    Directory.CreateDirectory(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc");
+    using (StreamWriter sw = new StreamWriter(File.Create(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.json")))
     {
         sw.Write("{\"PythonPath\" : \"C:\\\\\"}");
     }
 }
-var json = JsonSerializer.Deserialize<PathClass>(File.ReadAllText(".\\pref.json"));
+var json = JsonSerializer.Deserialize<PathClass>(File.ReadAllText(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.json"));
 string pyfolder = json!.PythonPath!;
 
 
@@ -87,7 +90,7 @@ if (args.Length > 0)
         {
             json!.PythonPath = args[1];
             string jsonString = JsonSerializer.Serialize(json);
-            using (StreamWriter sw = new StreamWriter(File.OpenWrite(".\\pref.json")))
+            using (StreamWriter sw = new StreamWriter(File.OpenWrite(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.json")))
             {
                 sw.Write(jsonString);
             }
