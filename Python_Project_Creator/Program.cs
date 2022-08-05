@@ -5,6 +5,7 @@ using Python_Project_Creator;
 string origin_project_path = "";
 string def_package_folder_name = "package";
 string def_json_name = "data.json";
+bool isBlank = false;
 
 
 //Create a json file for preferences
@@ -31,17 +32,19 @@ Usage:
 
  - ppc --version -> Prints out the version.
 
- - ppc <projectname> -> Creates a project called <projectname> to the designated path. (Flag modifiable)
+ - ppc <filename> -> Creates a project called <projectpath> to the designated path. (Flag modifiable)
 
- - ppc --projectpath -> Prints out the designated file path. If a path hasn't been specified before then the designated path will be C:\\
+ - ppc --filepath -> Prints out the designated file path. If a path hasn't been specified before then the designated path will be C:\\
 
- - ppc --projectpath <projectpath> -> Sets the designated file path to <projectpath>. 
+ - ppc --filepath <filepath> -> Sets the designated file path to <filepath>. 
 
  - ppc -p <packagename> -> The package in the project will be named <packagename>.
 
  - ppc -json <jsonname> -> The json file in the project will be named <jsonname>.
 
-Note: You can use the 'and' keyword to combine the --projectpath , -p and -json flags.
+ - ppc --blank -> The project which will be created will just be a blank main.py. If this is used with the 'and' function a true or false value must be determined
+
+Note: You can use the 'and' keyword to combine the --projectpath , -p , --blank and -json flags.
 ");
     Environment.Exit(0);
 }
@@ -90,6 +93,16 @@ if (args.Length > 0)
                     else
                     {
                         def_json_name = commands[1] + ".json";
+                    }
+                }else if (commands[0] == "--blank")
+                {
+                    if (commands[1].ToLower() == "true")
+                    {
+                        isBlank = true;
+                    }
+                    else if (commands[1].ToLower() == "false")
+                    {
+                        isBlank = false;
                     }
                 }
             }
@@ -145,6 +158,10 @@ if (args.Length > 0)
         {
             GetHelp();
         }
+        else if (args.Length == 2 && args[1] == "--blank")
+        {
+            isBlank = true;
+        }
     }
     catch (Exception e)
     {
@@ -187,9 +204,13 @@ async Task<int> CreateNewFile(string filename)
             {
                 await fs.WriteAsync("{\n\n}");
             }
-            if (filename == "main.py")
+            if (filename == "main.py" && isBlank == false)
             {
                 await fs.WriteAsync($"import json\nimport os\nimport math\nimport sys\nimport time\nimport packages.{def_package_folder_name}\n\ndef main():\n    with open(\"./json/{def_json_name}\" , \"r\") as f:\n        data = json.load(f)\n\n\nif __name__ == '__main__':\n    main()");
+            }
+            else if (filename == "main.py" && isBlank == true)
+            {
+                await fs.WriteAsync("");
             }
         }
     }
@@ -205,13 +226,17 @@ try
 {
 
     await CreateNewFile("main.py");
-    new_project_path = Path.Combine(origin_project_path, "json");
-    Directory.CreateDirectory(new_project_path);
-    await CreateNewFile(def_json_name);
-    new_project_path = Path.Combine(origin_project_path, "packages");
-    Directory.CreateDirectory(new_project_path);
-    await CreateNewFile("__init__.py");
-    await CreateNewFile((def_package_folder_name+".py"));
+    if (!isBlank)
+    {
+        new_project_path = Path.Combine(origin_project_path, "json");
+        Directory.CreateDirectory(new_project_path);
+        await CreateNewFile(def_json_name);
+        new_project_path = Path.Combine(origin_project_path, "packages");
+        Directory.CreateDirectory(new_project_path);
+        await CreateNewFile("__init__.py");
+        await CreateNewFile((def_package_folder_name+".py"));
+    }
+        
 
 
 }
