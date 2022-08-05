@@ -30,8 +30,6 @@ if (args.Length > 0)
 {
     try
     {
-
-    
         List<string> arr = args.ToList();
         if (arr.Contains("and"))
         {
@@ -117,6 +115,11 @@ if (args.Length > 0)
                 def_json_name = args[2] + ".json";
             }
         }
+        else if (args.Length == 1 && args[0] == "--version")
+        {
+            Console.WriteLine($"The version 1.8.2 of ppc is currently installed"); // Litterally the wors possible solution to the problem.
+            Environment.Exit(0);
+        }
     }catch (Exception e)
     {
         Console.WriteLine(e.Message);
@@ -140,7 +143,7 @@ if (project_name == null)
 
 string new_project_path = Path.Combine(pyfolder!, project_name);
 
-if (Directory.Exists(new_project_path))
+if (Directory.Exists(new_project_path)) // Application exit is nescessary or could do an infinite loop.
 {
     Console.WriteLine("A project named like this already exists.");
     project_name = null;
