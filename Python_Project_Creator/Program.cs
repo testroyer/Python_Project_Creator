@@ -146,8 +146,8 @@ string new_project_path = Path.Combine(pyfolder!, project_name);
 if (Directory.Exists(new_project_path)) // Application exit is nescessary or could do an infinite loop.
 {
     Console.WriteLine("A project named like this already exists.");
-    project_name = null;
-    goto Start;
+    Environment.Exit(0);
+    
 }
 
 origin_project_path = new_project_path;
