@@ -141,7 +141,7 @@ if (args.Length > 0)
             Console.WriteLine($"The version 1.8.2 of ppc is currently installed"); // Litterally the wors possible solution to the problem.
             Environment.Exit(0);
         }
-        else if (args.Length == 1 && args[0] == "--help")
+        else if (args.Length == 1 && (args[0] == "--help" || args[0] == "-h"))
         {
             GetHelp();
         }
