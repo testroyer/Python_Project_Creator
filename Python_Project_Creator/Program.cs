@@ -23,7 +23,28 @@ if (!File.Exists(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.j
 var json = JsonSerializer.Deserialize<PathClass>(File.ReadAllText(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.json"));
 string pyfolder = json!.PythonPath!;
 
+void GetHelp()
+{
+    Console.Write(@"PPC version 1.8.2
 
+Usage:
+
+ - ppc --version -> Prints out the version.
+
+ - ppc <projectname> -> Creates a project called <projectname> to the designated path. (Flag modifiable)
+
+ - ppc --projectpath -> Prints out the designated file path. If a path hasn't been specified before then the designated path will be C:\\
+
+ - ppc --projectpath <projectpath> -> Sets the designated file path to <projectpath>. 
+
+ - ppc -p <packagename> -> The package in the project will be named <packagename>.
+
+ - ppc -json <jsonname> -> The json file in the project will be named <jsonname>.
+
+Note: You can use the 'and' keyword to combine the --projectpath , -p and -json flags.
+");
+    Environment.Exit(0);
+}
 
 
 if (args.Length > 0)
@@ -120,7 +141,12 @@ if (args.Length > 0)
             Console.WriteLine($"The version 1.8.2 of ppc is currently installed"); // Litterally the wors possible solution to the problem.
             Environment.Exit(0);
         }
-    }catch (Exception e)
+        else if (args.Length == 1 && args[0] == "--help")
+        {
+            GetHelp();
+        }
+    }
+    catch (Exception e)
     {
         Console.WriteLine(e.Message);
         Environment.Exit(1);
@@ -133,11 +159,10 @@ ProjectName:
 var project_name = args.AsQueryable().FirstOrDefault();
 
 
-Start:
+Start: 
 if (project_name == null)
 {
-    Console.Write("Enter a project name:");
-    project_name = Console.ReadLine()!.Trim();
+    GetHelp();
 }
 
 
@@ -147,7 +172,6 @@ if (Directory.Exists(new_project_path)) // Application exit is nescessary or cou
 {
     Console.WriteLine("A project named like this already exists.");
     Environment.Exit(0);
-    
 }
 
 origin_project_path = new_project_path;
