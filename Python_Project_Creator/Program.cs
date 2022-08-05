@@ -32,11 +32,11 @@ Usage:
 
  - ppc --version -> Prints out the version.
 
- - ppc <filename> -> Creates a project called <projectpath> to the designated path. (Flag modifiable)
+ - ppc <projectname> -> Creates a project called <projectname> to the designated path. (Flag modifiable)
 
- - ppc --filepath -> Prints out the designated file path. If a path hasn't been specified before then the designated path will be C:\\
+ - ppc --projectpath -> Prints out the designated file path. If a path hasn't been specified before then the designated path will be C:\\
 
- - ppc --filepath <filepath> -> Sets the designated file path to <filepath>. 
+ - ppc --projectpath <projectpath> -> Sets the designated file path to <projectpath>. 
 
  - ppc -p <packagename> -> The package in the project will be named <packagename>.
 
@@ -44,7 +44,7 @@ Usage:
 
  - ppc --blank -> The project which will be created will just be a blank main.py. If this is used with the 'and' function a true or false value must be determined
 
-Note: You can use the 'and' keyword to combine the --projectpath , -p , --blank and -json flags.
+Note: You can use the 'and' keyword to combine the --projectpath , -p and -json flags.S
 ");
     Environment.Exit(0);
 }
