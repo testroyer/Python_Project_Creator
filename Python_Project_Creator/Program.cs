@@ -7,7 +7,7 @@ string def_package_folder_name = "package";
 string def_json_name = "data.json";
 bool isBlank = false;
 bool noJson = false;
-
+bool noPack;
 
 //Create a json file for preferences
 string currrent_directory = Directory.GetCurrentDirectory();
@@ -199,7 +199,7 @@ Start:
 if (project_name == null)
 {
     GetHelp();
-    // Bug to fix here
+    Environment.Exit(0);
 }
 
 
