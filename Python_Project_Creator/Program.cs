@@ -14,7 +14,7 @@ string currrent_directory = Directory.GetCurrentDirectory();
 string[] current_directory_array = currrent_directory.Split('\\');
 string current_user_directory = current_directory_array[2];
 
-if (!File.Exists(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.json"))
+if (!File.Exists(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.json")) // Somwhere in the code it adds }" to and of the json file
 {
     Directory.CreateDirectory(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc");
     using (StreamWriter sw = new StreamWriter(File.Create(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.json")))
@@ -145,7 +145,7 @@ if (args.Length > 0)
             Console.WriteLine($"Project path: {pyfolder}");
             Environment.Exit(0);
         }
-        else if (args.Length == 2 && args[0] == "--projectpath")
+        else if (args.Length == 2 && args[0] == "--projectpath") // Somwhere in the code it adds }" to and of the json file
         {
             json!.PythonPath = args[1];
             string jsonString = JsonSerializer.Serialize(json);
