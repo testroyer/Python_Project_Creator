@@ -27,7 +27,7 @@ string pyfolder = json!.PythonPath!;
 
 void GetHelp()
 {
-    Console.Write(@"PPC version 1.8.2
+    Console.Write(@"PPC version 1.9.2
 
 Usage:
 
@@ -178,7 +178,7 @@ if (args.Length > 0)
         }
         else if (args.Length == 1 && args[0] == "--version")
         {
-            Console.WriteLine($"The version 1.8.2 of ppc is currently installed"); // Litterally the wors possible solution to the problem.
+            Console.WriteLine($"The version 1.9.2 of ppc is currently installed"); // Litterally the wors possible solution to the problem.
             Environment.Exit(0);
         }
         else if (args.Length == 1 && (args[0] == "--help" || args[0] == "-h"))
