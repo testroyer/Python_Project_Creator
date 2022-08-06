@@ -7,7 +7,7 @@ string def_package_folder_name = "package";
 string def_json_name = "data.json";
 bool isBlank = false;
 bool noJson = false;
-bool noPack;
+bool noPack = false;
 
 //Create a json file for preferences
 string currrent_directory = Directory.GetCurrentDirectory();
@@ -47,8 +47,9 @@ Usage:
 
  - ppc --nojson -> The prject witch will be created won't have a json file. If this is used with the 'and' function a true or false value must be determined
 
+ - ppc --nopack The prject witch will be created won't have a pre made package. If this is used with the 'and' function a true or false value must be determined
 
-Note: You can use the 'and' keyword to combine the --projectpath, --blank (true or false), --nojson (true or false), -p and -json flags.
+Note: You can use the 'and' keyword to combine the --projectpath, --blank (true or false), --nojson (true or false), --nopack (true or false), -p and -json flags.
 ");
     Environment.Exit(0);
 }
@@ -120,6 +121,17 @@ if (args.Length > 0)
                         noJson = false;
                     }
                 }
+                else if (commands[0] == "--nopack")
+                {
+                    if (commands[1].ToLower() == "true")
+                    {
+                        noPack = true;
+                    }
+                    else if (commands[1].ToLower() == "false")
+                    {
+                        noPack = false;
+                    }
+                }
             }
 
             goto ProjectName;
@@ -181,6 +193,10 @@ if (args.Length > 0)
         {
             noJson = true;
         }
+        else if (args.Length == 2 && args[1] == "--nopack")
+        {
+            noPack = true;
+        }
     }
     catch (Exception e)
     {
@@ -224,7 +240,7 @@ async Task<int> CreateNewFile(string filename)
             {
                 await fs.WriteAsync("{\n\n}");
             }
-            if (filename == "main.py" && isBlank == false && noJson == false)
+            if (filename == "main.py" && isBlank == false && noJson == false && noPack == false)
             {
                 await fs.WriteAsync($"import json\nimport os\nimport math\nimport sys\nimport time\nimport packages.{def_package_folder_name}\n\ndef main():\n    with open(\"./json/{def_json_name}\" , \"r\") as f:\n        data = json.load(f)\n\n\nif __name__ == '__main__':\n    main()");
             }
@@ -232,9 +248,17 @@ async Task<int> CreateNewFile(string filename)
             {
                 await fs.WriteAsync("");
             }
-            else if (filename == "main.py" && noJson == true)
+            else if (filename == "main.py" && noJson == true && noPack == false)
             {
                 await fs.WriteAsync($"import json\nimport os\nimport math\nimport sys\nimport time\nimport packages.{def_package_folder_name}\n\ndef main():\n    pass\n\n\nif __name__ == '__main__':\n    main()");
+            }
+            else if (filename == "main.py" && noJson == false && noPack == true)
+            {
+                await fs.WriteAsync($"import json\nimport os\nimport math\nimport sys\nimport time\n\n\ndef main():\n    with open(\"./json/{def_json_name}\" , \"r\") as f:\n        data = json.load(f)\n\n\nif __name__ == '__main__':\n    main()");
+            }
+            else if (filename == "main.py" && noJson == true && noPack == true)
+            {
+                await fs.WriteAsync($"import json\nimport os\nimport math\nimport sys\nimport time\n\n\ndef main():\n    pass\n\n\nif __name__ == '__main__':\n    main()");
             }
         }
     }
@@ -280,6 +304,6 @@ catch (Exception e)
 }
 finally
 {
-    Console.WriteLine("Program finish");
+    Console.WriteLine("Program finished");
 }
 
