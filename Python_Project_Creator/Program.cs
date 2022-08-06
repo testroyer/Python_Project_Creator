@@ -6,6 +6,7 @@ string origin_project_path = "";
 string def_package_folder_name = "package";
 string def_json_name = "data.json";
 bool isBlank = false;
+bool noJson = false;
 
 
 //Create a json file for preferences
@@ -42,9 +43,12 @@ Usage:
 
  - ppc -json <jsonname> -> The json file in the project will be named <jsonname>.
 
- - ppc --blank -> The project which will be created will just be a blank main.py. If this is used with the 'and' function a true or false value must be determined
+ - ppc --blank -> The project which will be created will just be a blank main.py. If this is used with the 'and' function a true or false value must be determined.
 
-Note: You can use the 'and' keyword to combine the --projectpath , -p and -json flags.S
+ - ppc --nojson -> The prject witch will be created won't have a json file. If this is used with the 'and' function a true or false value must be determined
+
+
+Note: You can use the 'and' keyword to combine the --projectpath, --blank (true or false), --nojson (true or false), -p and -json flags.
 ");
     Environment.Exit(0);
 }
@@ -105,6 +109,17 @@ if (args.Length > 0)
                         isBlank = false;
                     }
                 }
+                else if (commands[0] == "--nojson")
+                {
+                    if (commands[1].ToLower() == "true")
+                    {
+                        noJson = true;
+                    }
+                    else if (commands[1].ToLower() == "false")
+                    {
+                        noJson = false;
+                    }
+                }
             }
 
             goto ProjectName;
@@ -162,6 +177,10 @@ if (args.Length > 0)
         {
             isBlank = true;
         }
+        else if (args.Length == 2 && args[1] == "--nojson")
+        {
+            noJson = true;
+        }
     }
     catch (Exception e)
     {
@@ -180,6 +199,7 @@ Start:
 if (project_name == null)
 {
     GetHelp();
+    // Bug to fix here
 }
 
 
@@ -204,13 +224,17 @@ async Task<int> CreateNewFile(string filename)
             {
                 await fs.WriteAsync("{\n\n}");
             }
-            if (filename == "main.py" && isBlank == false)
+            if (filename == "main.py" && isBlank == false && noJson == false)
             {
                 await fs.WriteAsync($"import json\nimport os\nimport math\nimport sys\nimport time\nimport packages.{def_package_folder_name}\n\ndef main():\n    with open(\"./json/{def_json_name}\" , \"r\") as f:\n        data = json.load(f)\n\n\nif __name__ == '__main__':\n    main()");
             }
             else if (filename == "main.py" && isBlank == true)
             {
                 await fs.WriteAsync("");
+            }
+            else if (filename == "main.py" && noJson == true)
+            {
+                await fs.WriteAsync($"import json\nimport os\nimport math\nimport sys\nimport time\nimport packages.{def_package_folder_name}\n\ndef main():\n    pass\n\n\nif __name__ == '__main__':\n    main()");
             }
         }
     }
@@ -228,13 +252,22 @@ try
     await CreateNewFile("main.py");
     if (!isBlank)
     {
-        new_project_path = Path.Combine(origin_project_path, "json");
-        Directory.CreateDirectory(new_project_path);
-        await CreateNewFile(def_json_name);
-        new_project_path = Path.Combine(origin_project_path, "packages");
-        Directory.CreateDirectory(new_project_path);
-        await CreateNewFile("__init__.py");
-        await CreateNewFile((def_package_folder_name+".py"));
+        if (!noJson)
+        {
+            //Creation of the json directory and files
+            new_project_path = Path.Combine(origin_project_path, "json");
+            Directory.CreateDirectory(new_project_path);
+            await CreateNewFile(def_json_name);
+        }
+        
+        if (!noPack) {
+            // Creation of the packages folder and files
+            new_project_path = Path.Combine(origin_project_path, "packages");
+            Directory.CreateDirectory(new_project_path);
+            await CreateNewFile("__init__.py");
+            await CreateNewFile((def_package_folder_name + ".py"));
+        }
+        
     }
         
 
