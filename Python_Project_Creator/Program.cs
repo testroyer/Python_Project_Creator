@@ -1,5 +1,7 @@
 ﻿using System.Text.Json;
 using Python_Project_Creator;
+using System.Diagnostics;
+
 
 
 string origin_project_path = "";
@@ -293,8 +295,9 @@ try
         }
         
     }
-        
 
+    string command = @$"/C cd {origin_project_path} && code .";
+    Process.Start("cmd.exe", command);
 
 }
 catch (Exception e)
