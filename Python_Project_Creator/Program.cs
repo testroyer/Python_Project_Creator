@@ -153,6 +153,7 @@ if (args.Length > 0)
             string jsonString = JsonSerializer.Serialize(json);
             using (StreamWriter sw = new StreamWriter(File.OpenWrite(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.json")))
             {
+                sw.AutoFlush = true;
                 sw.Write(jsonString);
             }
             Console.WriteLine($"New path changed to: {json.PythonPath}");
