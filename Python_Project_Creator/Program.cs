@@ -29,7 +29,7 @@ string pyfolder = json!.PythonPath!;
 
 void GetHelp()
 {
-    Console.Write(@"PPC version 1.9.2
+    Console.Write(@"PPC version 1.9.4
 
 Usage:
 
@@ -151,9 +151,10 @@ if (args.Length > 0)
         {
             json!.PythonPath = args[1];
             string jsonString = JsonSerializer.Serialize(json);
+            File.WriteAllText(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.json", String.Empty); // Empities string before writing to prevent issues caused by length.
             using (StreamWriter sw = new StreamWriter(File.OpenWrite(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.json")))
             {
-                sw.AutoFlush = true;
+                sw.Write("");
                 sw.Write(jsonString);
             }
             Console.WriteLine($"New path changed to: {json.PythonPath}");
@@ -181,7 +182,7 @@ if (args.Length > 0)
         }
         else if (args.Length == 1 && args[0] == "--version")
         {
-            Console.WriteLine($"The version 1.9.2 of ppc is currently installed"); // Litterally the wors possible solution to the problem.
+            Console.WriteLine($"The version 1.9.4 of ppc is currently installed"); // Litterally the wors possible solution to the problem.
             Environment.Exit(0);
         }
         else if (args.Length == 1 && (args[0] == "--help" || args[0] == "-h"))
