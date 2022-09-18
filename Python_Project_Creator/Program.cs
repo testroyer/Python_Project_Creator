@@ -24,6 +24,13 @@ if (!File.Exists(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.j
         sw.Write("{\"PythonPath\" : \"C:\\\\\"}");
     }
 }
+
+if (!Directory.Exists(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets"))
+{
+    Directory.CreateDirectory(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets");
+}
+
+
 var json = JsonSerializer.Deserialize<PathClass>(File.ReadAllText(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.json"));
 string pyfolder = json!.PythonPath!;
 
@@ -56,6 +63,20 @@ Note: You can use the 'and' keyword to combine the --projectpath, --blank (true 
     Environment.Exit(0);
 }
 
+void CopyDirectory(string directory , string target)
+{
+    string[] sub_directories = Directory.GetDirectories(directory);
+    foreach (string sub_directory in sub_directories)
+    {
+    }
+
+    string[] files = Directory.GetFiles(directory);
+    foreach (string file in files)
+    {
+        File.Copy(file, target);
+    }
+    
+}
 
 if (args.Length > 0)
 {
@@ -140,7 +161,6 @@ if (args.Length > 0)
         }
 
 
-
         if (args.Length == 1 && args[0] == "--projectpath")
         {
 
@@ -200,6 +220,30 @@ if (args.Length > 0)
         else if (args.Length == 2 && args[1] == "--nopack")
         {
             noPack = true;
+        }
+        else if (args.Length == 4 && args[1] == "--create-pack")
+        {
+            //string currrent_directory = Directory.GetCurrentDirectory();
+            //string[] current_directory_array = currrent_directory.Split('\\');
+            //string current_user_directory = current_directory_array[2];
+
+            string copy_directory = args[2];
+            string combined_directory = Path.Combine(currrent_directory , copy_directory);
+            if (!Directory.Exists(combined_directory))
+            {
+                Console.WriteLine("A folder like that doesn't exist");
+                Environment.Exit(0);
+            }
+            string target_directory = Path.Combine(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc" , args[3]);
+
+            string[] get_subdirectories = Directory.GetDirectories(combined_directory);
+            foreach(string subdir in get_subdirectories)
+            {
+
+            }
+
+
+
         }
     }
     catch (Exception e)
