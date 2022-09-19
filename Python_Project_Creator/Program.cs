@@ -56,7 +56,9 @@ Usage:
 
  - ppc --nojson -> The prject witch will be created won't have a json file. If this is used with the 'and' function a true or false value must be determined
 
- - ppc --nopack The prject witch will be created won't have a pre made package. If this is used with the 'and' function a true or false value must be determined
+ - ppc --nopack -> The prject witch will be created won't have a pre made package. If this is used with the 'and' function a true or false value must be determined
+
+ - ppc --create-preset <projectpath> <projectname> -> Creates a project preset for later used named <projectname> under th ppc folder.
 
 Note: You can use the 'and' keyword to combine the --projectpath, --blank (true or false), --nojson (true or false), --nopack (true or false), -p and -json flags.
 ");
@@ -65,17 +67,24 @@ Note: You can use the 'and' keyword to combine the --projectpath, --blank (true 
 
 void CopyDirectory(string directory , string target)
 {
-    string[] sub_directories = Directory.GetDirectories(directory);
-    foreach (string sub_directory in sub_directories)
-    {
-    }
+    Directory.CreateDirectory(target);
 
+    //Get files ad copy them to the target
     string[] files = Directory.GetFiles(directory);
     foreach (string file in files)
     {
-        File.Copy(file, target);
+        string[] file_array = file.Split("\\");
+        File.Copy(file, Path.Combine(target , file_array[file_array.Length - 1]));
     }
-    
+
+    //Get directoriesstring
+    string[] dirs = Directory.GetDirectories(directory);
+    foreach (string dir in dirs)
+    {
+        string[] directory_array = dir.Split("\\");
+        CopyDirectory(Path.Combine(directory, directory_array[directory_array.Length - 1]), Path.Combine(target, directory_array[directory_array.Length - 1]));
+    }
+
 }
 
 if (args.Length > 0)
@@ -167,6 +176,26 @@ if (args.Length > 0)
             Console.WriteLine($"Project path: {pyfolder}");
             Environment.Exit(0);
         }
+        else if (args.Length == 3 && args[0] == "--create-preset")
+        {
+            string directory_arg = args[1];
+            string target_arg = args[2];
+
+            if (directory_arg.StartsWith("."))
+            {
+                directory_arg = directory_arg.Substring(2);
+                CopyDirectory(Path.Combine(current_directory_array[current_directory_array.Length - 1] , directory_arg), Path.Combine(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets" , target_arg));
+            }
+            else
+            {
+                CopyDirectory(Path.Combine(current_directory_array[current_directory_array.Length - 1] , directory_arg), Path.Combine(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets" , target_arg));
+            }
+
+            Console.WriteLine($"The template {target_arg} has been created successfully");
+            Environment.Exit(0);
+
+        }
+        else if 
         else if (args.Length == 2 && args[0] == "--projectpath") // Somwhere in the code it adds }" to and of the json file
         {
             json!.PythonPath = args[1];
@@ -220,30 +249,6 @@ if (args.Length > 0)
         else if (args.Length == 2 && args[1] == "--nopack")
         {
             noPack = true;
-        }
-        else if (args.Length == 4 && args[1] == "--create-pack")
-        {
-            //string currrent_directory = Directory.GetCurrentDirectory();
-            //string[] current_directory_array = currrent_directory.Split('\\');
-            //string current_user_directory = current_directory_array[2];
-
-            string copy_directory = args[2];
-            string combined_directory = Path.Combine(currrent_directory , copy_directory);
-            if (!Directory.Exists(combined_directory))
-            {
-                Console.WriteLine("A folder like that doesn't exist");
-                Environment.Exit(0);
-            }
-            string target_directory = Path.Combine(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc" , args[3]);
-
-            string[] get_subdirectories = Directory.GetDirectories(combined_directory);
-            foreach(string subdir in get_subdirectories)
-            {
-
-            }
-
-
-
         }
     }
     catch (Exception e)
