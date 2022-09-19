@@ -3,6 +3,7 @@ using Python_Project_Creator;
 using System.Diagnostics;
 
 
+string version = "1.9.6";
 
 string origin_project_path = "";
 string def_package_folder_name = "package";
@@ -36,7 +37,7 @@ string pyfolder = json!.PythonPath!;
 
 void GetHelp()
 {
-    Console.Write(@"PPC version 1.9.4
+    Console.Write(@$"PPC version {version}
 
 Usage:
 
@@ -59,6 +60,8 @@ Usage:
  - ppc --nopack -> The prject witch will be created won't have a pre made package. If this is used with the 'and' function a true or false value must be determined
 
  - ppc --create-preset <projectpath> <projectname> -> Creates a project preset for later used named <projectname> under th ppc folder.
+
+ - ppc --presets -> Displays the premade presets.
 
 Note: You can use the 'and' keyword to combine the --projectpath, --blank (true or false), --nojson (true or false), --nopack (true or false), -p and -json flags.
 ");
@@ -195,7 +198,24 @@ if (args.Length > 0)
             Environment.Exit(0);
 
         }
-        else if 
+        else if (args.Length == 1 && args[0] == "--presets")
+        {
+            string[] presets = Directory.GetDirectories(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets");
+            if (presets.Length != 0)
+            {
+                Console.WriteLine("Avalible presets are:");
+                foreach (string preset in presets)
+                {
+                    //string[] preset_arr = preset.Split("\\");
+                    Console.WriteLine($"> {Path.GetFileName(preset)}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("There aren't any presets avalible");
+            }
+            Environment.Exit(0);
+        }
         else if (args.Length == 2 && args[0] == "--projectpath") // Somwhere in the code it adds }" to and of the json file
         {
             json!.PythonPath = args[1];
@@ -231,7 +251,7 @@ if (args.Length > 0)
         }
         else if (args.Length == 1 && args[0] == "--version")
         {
-            Console.WriteLine($"The version 1.9.4 of ppc is currently installed"); // Litterally the wors possible solution to the problem.
+            Console.WriteLine($"The version {version} of ppc is currently installed"); // Litterally the wors possible solution to the problem.
             Environment.Exit(0);
         }
         else if (args.Length == 1 && (args[0] == "--help" || args[0] == "-h"))
