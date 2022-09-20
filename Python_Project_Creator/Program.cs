@@ -3,7 +3,7 @@ using Python_Project_Creator;
 using System.Diagnostics;
 
 
-string version = "1.9.6";
+string version = "1.9.7";
 
 string origin_project_path = "";
 string def_package_folder_name = "package";
@@ -59,9 +59,11 @@ Usage:
 
  - ppc --nopack -> The prject witch will be created won't have a pre made package. If this is used with the 'and' function a true or false value must be determined
 
- - ppc --create-preset <projectpath> <projectname> -> Creates a project preset for later used named <projectname> under th ppc folder.
+ - ppc --create-preset <presetpath> <presetname> -> Creates a project preset for later used named <projectname> under th ppc folder.
 
  - ppc --presets -> Displays the premade presets.
+ 
+ - ppc --delete-preset <presetname> -> Deletes preset named <presetname>.
 
 Note: You can use the 'and' keyword to combine the --projectpath, --blank (true or false), --nojson (true or false), --nopack (true or false), -p and -json flags.
 ");
@@ -215,6 +217,41 @@ if (args.Length > 0)
                 Console.WriteLine("There aren't any presets avalible");
             }
             Environment.Exit(0);
+        }
+        else if (args.Length == 2 && args[0] == "--delte-preset")
+        {
+
+            string target_preset = args[1];
+            Get_Confirm:
+            Console.Write($"Are you sure you want to delete '{target_preset}', this cant be reverted (y/n): ");
+            string? confirm = Console.ReadLine();
+            if (confirm == "y" || confirm == "Y")
+            {
+                string target_presed_folder = Path.Combine(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets", target_preset);
+                if (Directory.Exists(target_presed_folder))
+                {
+                    Directory.Delete(target_presed_folder , true);
+                    Console.WriteLine($"Preset '{target_preset}' was removed succesfully.");
+                    Environment.Exit(0);
+                }
+                else
+                {
+                    Console.WriteLine($"There isn't any preset named {target_preset}");
+                    Environment.Exit(1);    
+                }
+            }
+            else if (confirm == "n" || confirm == "N")
+            {
+                Console.WriteLine("Deletion aborted.");
+                Environment.Exit(0);
+            }
+            else
+            {
+                Console.WriteLine("You should enter an accaptable value");
+                goto Get_Confirm;
+            }
+
+
         }
         else if (args.Length == 2 && args[0] == "--projectpath") // Somwhere in the code it adds }" to and of the json file
         {
