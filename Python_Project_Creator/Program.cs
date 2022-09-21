@@ -185,6 +185,13 @@ if (args.Length > 0)
         {
             string directory_arg = args[1];
             string target_arg = args[2];
+            string target_path = Path.Combine(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets", target_arg);
+            if (Directory.Exists(target_path))
+            {
+                Console.WriteLine("A preset like that already exists.");
+                Environment.Exit(0);
+            
+            }
 
             if (directory_arg.StartsWith("."))
             {
