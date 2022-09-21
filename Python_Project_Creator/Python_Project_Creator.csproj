@@ -8,6 +8,6 @@
 		<PackAsTool>true</PackAsTool>
 		<ToolCommandName>ppc</ToolCommandName>
 		<PackageOutputPath>./nupkg</PackageOutputPath>
-		<Version>1.9.7.1</Version>
+		<Version>1.9.7.2</Version>
 	</PropertyGroup> 
 </Project>

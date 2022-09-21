@@ -225,37 +225,37 @@ if (args.Length > 0)
             }
             Environment.Exit(0);
         }
-        else if (args.Length == 2 && args[0] == "--delte-preset")
+        else if (args.Length == 2 && args[0] == "--delete-preset")
         {
 
             string target_preset = args[1];
-            Get_Confirm:
-            Console.Write($"Are you sure you want to delete '{target_preset}', this cant be reverted (y/n): ");
-            string? confirm = Console.ReadLine();
-            if (confirm == "y" || confirm == "Y")
+            string target_presed_folder = Path.Combine(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets", target_preset);
+            if (Directory.Exists(target_presed_folder))
             {
-                string target_presed_folder = Path.Combine(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets", target_preset);
-                if (Directory.Exists(target_presed_folder))
+                Get_Confirm:
+                Console.Write($"Are you sure you want to delete '{target_preset}', this cant be reverted (y/n): ");
+                string? confirm = Console.ReadLine();
+                if (confirm == "y" || confirm == "Y")
                 {
-                    Directory.Delete(target_presed_folder , true);
+                    Directory.Delete(target_presed_folder, true);
                     Console.WriteLine($"Preset '{target_preset}' was removed succesfully.");
+                    Environment.Exit(0);
+                }
+                else if (confirm == "n" || confirm == "N")
+                {
+                    Console.WriteLine("Deletion aborted.");
                     Environment.Exit(0);
                 }
                 else
                 {
-                    Console.WriteLine($"There isn't any preset named {target_preset}");
-                    Environment.Exit(1);    
+                    Console.WriteLine("You should enter an accaptable value");
+                    goto Get_Confirm;
                 }
-            }
-            else if (confirm == "n" || confirm == "N")
-            {
-                Console.WriteLine("Deletion aborted.");
-                Environment.Exit(0);
             }
             else
             {
-                Console.WriteLine("You should enter an accaptable value");
-                goto Get_Confirm;
+                Console.WriteLine($"There isn't any preset named {target_preset}");
+                Environment.Exit(1);
             }
 
 
