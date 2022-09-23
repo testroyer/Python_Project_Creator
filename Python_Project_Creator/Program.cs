@@ -1,8 +1,10 @@
 ﻿using System.Text.Json;
 using Python_Project_Creator;
 using System.Diagnostics;
+using CopySpace;
 
 
+string version = "1.10";
 
 string origin_project_path = "";
 string def_package_folder_name = "package";
@@ -24,12 +26,20 @@ if (!File.Exists(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.j
         sw.Write("{\"PythonPath\" : \"C:\\\\\"}");
     }
 }
+
+if (!Directory.Exists(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets"))
+{
+    Directory.CreateDirectory(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets");
+}
+
+string preset_folder = @$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets";
+
 var json = JsonSerializer.Deserialize<PathClass>(File.ReadAllText(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.json"));
 string pyfolder = json!.PythonPath!;
 
 void GetHelp()
 {
-    Console.Write(@"PPC version 1.9.4
+    Console.Write(@$"PPC version {version}
 
 Usage:
 
@@ -49,7 +59,15 @@ Usage:
 
  - ppc --nojson -> The prject witch will be created won't have a json file. If this is used with the 'and' function a true or false value must be determined
 
- - ppc --nopack The prject witch will be created won't have a pre made package. If this is used with the 'and' function a true or false value must be determined
+ - ppc --nopack -> The prject witch will be created won't have a pre made package. If this is used with the 'and' function a true or false value must be determined
+
+ - ppc --create-preset <presetpath> <presetname> -> Creates a project preset for later used named <projectname> under th ppc folder.
+
+ - ppc --use-preset <presetname> <foldername>? -> Creates a new project base to <projectpath> optionally named <foldername>
+
+ - ppc --presets -> Displays the premade presets.
+ 
+ - ppc --delete-preset <presetname> -> Deletes preset named <presetname>.
 
 Note: You can use the 'and' keyword to combine the --projectpath, --blank (true or false), --nojson (true or false), --nopack (true or false), -p and -json flags.
 ");
@@ -140,12 +158,139 @@ if (args.Length > 0)
         }
 
 
-
         if (args.Length == 1 && args[0] == "--projectpath")
         {
 
             Console.WriteLine($"Project path: {pyfolder}");
             Environment.Exit(0);
+        }
+        else if (args.Length == 3 && args[0] == "--create-preset")
+        {
+            string directory_arg = args[1];
+            string target_arg = args[2];
+            string target_path = Path.Combine(preset_folder, target_arg);
+            if (Directory.Exists(target_path))
+            {
+                Console.WriteLine("A preset like that already exists.");
+                Environment.Exit(0);
+            
+            }
+
+            if (directory_arg.StartsWith("."))
+            {
+                directory_arg = directory_arg.Substring(2);
+                Copy.CopyDirectory(Path.Combine(currrent_directory, directory_arg), Path.Combine(preset_folder, target_arg));
+            }
+            else
+            {
+                Copy.CopyDirectory(directory_arg, target_path);
+            }
+            
+
+            Console.WriteLine($"The template '{target_arg}' has been created successfully");
+            Environment.Exit(0);
+
+        }
+        else if (args.Length == 1 && args[0] == "--presets")
+        {
+            string[] presets = Directory.GetDirectories(preset_folder);
+            if (presets.Length != 0)
+            {
+                Console.WriteLine("Avalible presets are:");
+                foreach (string preset in presets)
+                {
+                    //string[] preset_arr = preset.Split("\\");
+                    Console.WriteLine($"> {Path.GetFileName(preset)}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("There aren't any presets avalible");
+            }
+            Environment.Exit(0);
+        }
+        else if (args.Length == 2 && args[0] == "--delete-preset")
+        {
+
+            string target_preset = args[1];
+            string target_presed_folder = Path.Combine(preset_folder, target_preset);
+            if (Directory.Exists(target_presed_folder))
+            {
+                Get_Confirm:
+                Console.Write($"Are you sure you want to delete '{target_preset}', this cant be reverted (y/n): ");
+                string? confirm = Console.ReadLine();
+                if (confirm == "y" || confirm == "Y")
+                {
+                    Directory.Delete(target_presed_folder, true);
+                    Console.WriteLine($"Preset '{target_preset}' was removed succesfully.");
+                    Environment.Exit(0);
+                }
+                else if (confirm == "n" || confirm == "N")
+                {
+                    Console.WriteLine("Deletion aborted.");
+                    Environment.Exit(0);
+                }
+                else
+                {
+                    Console.WriteLine("You should enter an accaptable value");
+                    goto Get_Confirm;
+                }
+            }
+            else
+            {
+                Console.WriteLine($"There isn't any preset named {target_preset}");
+                Environment.Exit(1);
+            }
+
+
+        }
+        else if (args[0] == "--use-preset" && (args.Length == 3 || args.Length == 2))
+        {
+            switch (args.Length){
+                case 3:
+                    string preset_to_use = args[1];
+                    string folder_name = args[2];
+                    string preset_path = Path.Combine(preset_folder, preset_to_use);
+                    string target_path = Path.Combine(pyfolder, folder_name);
+                    if (!Directory.Exists(preset_path))
+                    {
+                        Console.WriteLine($"We couldn't find any preset named '{preset_to_use}'");
+                        Environment.Exit(1);
+                    }
+                    if (Directory.Exists(target_path))
+                    {
+                        Console.WriteLine($"There's already a project named '{folder_name}'");
+                        Environment.Exit(1);
+                    }
+                    Copy.CopyDirectory(preset_path, target_path);
+                    Console.WriteLine("Project created succesfully.");
+                    string opener_command = @$"/C cd {target_path} && code .";
+                    Process.Start("cmd.exe", opener_command);
+                    Environment.Exit(0);
+                    break;
+                case 2:
+                    preset_to_use = args[1];
+                    folder_name = preset_to_use;
+                    preset_path = Path.Combine(preset_folder, folder_name);
+                    target_path = Path.Combine(pyfolder, folder_name);
+                    if (!Directory.Exists(preset_path))
+                    {
+                        Console.WriteLine($"We couldn't find any preset named '{preset_to_use}'");
+                        Environment.Exit(1);
+                    }
+                    if (Directory.Exists(target_path))
+                    {
+                        Console.WriteLine($"There's already a project named '{folder_name}'");
+                        Environment.Exit(1);
+                    }
+                    Copy.CopyDirectory(preset_path, target_path);
+                    Console.WriteLine("Project created succesfully.");
+                    opener_command = @$"/C cd {target_path} && code .";
+                    Process.Start("cmd.exe", opener_command);
+                    Environment.Exit(0);
+                    break;
+            }
+
         }
         else if (args.Length == 2 && args[0] == "--projectpath") // Somwhere in the code it adds }" to and of the json file
         {
@@ -182,7 +327,7 @@ if (args.Length > 0)
         }
         else if (args.Length == 1 && args[0] == "--version")
         {
-            Console.WriteLine($"The version 1.9.4 of ppc is currently installed"); // Litterally the wors possible solution to the problem.
+            Console.WriteLine($"The version {version} of ppc is currently installed"); // Litterally the wors possible solution to the problem.
             Environment.Exit(0);
         }
         else if (args.Length == 1 && (args[0] == "--help" || args[0] == "-h"))
