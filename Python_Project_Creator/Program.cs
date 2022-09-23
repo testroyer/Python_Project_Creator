@@ -1,9 +1,10 @@
 ﻿using System.Text.Json;
 using Python_Project_Creator;
 using System.Diagnostics;
+using CopySpace;
 
 
-string version = "1.9.7";
+string version = "1.10";
 
 string origin_project_path = "";
 string def_package_folder_name = "package";
@@ -31,6 +32,7 @@ if (!Directory.Exists(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\p
     Directory.CreateDirectory(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets");
 }
 
+string preset_folder = @$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets";
 
 var json = JsonSerializer.Deserialize<PathClass>(File.ReadAllText(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\pref.json"));
 string pyfolder = json!.PythonPath!;
@@ -70,27 +72,6 @@ Note: You can use the 'and' keyword to combine the --projectpath, --blank (true 
     Environment.Exit(0);
 }
 
-void CopyDirectory(string directory , string target)
-{
-    Directory.CreateDirectory(target);
-
-    //Get files ad copy them to the target
-    string[] files = Directory.GetFiles(directory);
-    foreach (string file in files)
-    {
-        string[] file_array = file.Split("\\");
-        File.Copy(file, Path.Combine(target , file_array[file_array.Length - 1]));
-    }
-
-    //Get directoriesstring
-    string[] dirs = Directory.GetDirectories(directory);
-    foreach (string dir in dirs)
-    {
-        string[] directory_array = dir.Split("\\");
-        CopyDirectory(Path.Combine(directory, directory_array[directory_array.Length - 1]), Path.Combine(target, directory_array[directory_array.Length - 1]));
-    }
-
-}
 
 if (args.Length > 0)
 {
@@ -185,7 +166,7 @@ if (args.Length > 0)
         {
             string directory_arg = args[1];
             string target_arg = args[2];
-            string target_path = Path.Combine(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets", target_arg);
+            string target_path = Path.Combine(preset_folder, target_arg);
             if (Directory.Exists(target_path))
             {
                 Console.WriteLine("A preset like that already exists.");
@@ -196,20 +177,21 @@ if (args.Length > 0)
             if (directory_arg.StartsWith("."))
             {
                 directory_arg = directory_arg.Substring(2);
-                CopyDirectory(Path.Combine(current_directory_array[current_directory_array.Length - 1] , directory_arg), Path.Combine(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets" , target_arg));
+                Copy.CopyDirectory(Path.Combine(currrent_directory, directory_arg), Path.Combine(preset_folder, target_arg));
             }
             else
             {
-                CopyDirectory(Path.Combine(current_directory_array[current_directory_array.Length - 1] , directory_arg), Path.Combine(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets" , target_arg));
+                Copy.CopyDirectory(directory_arg, target_path);
             }
+            
 
-            Console.WriteLine($"The template {target_arg} has been created successfully");
+            Console.WriteLine($"The template '{target_arg}' has been created successfully");
             Environment.Exit(0);
 
         }
         else if (args.Length == 1 && args[0] == "--presets")
         {
-            string[] presets = Directory.GetDirectories(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets");
+            string[] presets = Directory.GetDirectories(preset_folder);
             if (presets.Length != 0)
             {
                 Console.WriteLine("Avalible presets are:");
@@ -229,7 +211,7 @@ if (args.Length > 0)
         {
 
             string target_preset = args[1];
-            string target_presed_folder = Path.Combine(@$"C:\Users\{current_user_directory}\AppData\Roaming\ppc\presets", target_preset);
+            string target_presed_folder = Path.Combine(preset_folder, target_preset);
             if (Directory.Exists(target_presed_folder))
             {
                 Get_Confirm:
@@ -258,6 +240,54 @@ if (args.Length > 0)
                 Environment.Exit(1);
             }
 
+
+        }
+        else if (args[0] == "--use-preset" && (args.Length == 3 || args.Length == 2))
+        {
+            switch (args.Length){
+                case 3:
+                    string preset_to_use = args[1];
+                    string folder_name = args[2];
+                    string preset_path = Path.Combine(preset_folder, preset_to_use);
+                    string target_path = Path.Combine(pyfolder, folder_name);
+                    if (!Directory.Exists(preset_path))
+                    {
+                        Console.WriteLine($"We couldn't find any preset named '{preset_to_use}'");
+                        Environment.Exit(1);
+                    }
+                    if (Directory.Exists(target_path))
+                    {
+                        Console.WriteLine($"There's already a project named '{folder_name}'");
+                        Environment.Exit(1);
+                    }
+                    Copy.CopyDirectory(preset_path, target_path);
+                    Console.WriteLine("Project created succesfully.");
+                    string opener_command = @$"/C cd {target_path} && code .";
+                    Process.Start("cmd.exe", opener_command);
+                    Environment.Exit(0);
+                    break;
+                case 2:
+                    preset_to_use = args[1];
+                    folder_name = preset_to_use;
+                    preset_path = Path.Combine(preset_folder, folder_name);
+                    target_path = Path.Combine(pyfolder, folder_name);
+                    if (!Directory.Exists(preset_path))
+                    {
+                        Console.WriteLine($"We couldn't find any preset named '{preset_to_use}'");
+                        Environment.Exit(1);
+                    }
+                    if (Directory.Exists(target_path))
+                    {
+                        Console.WriteLine($"There's already a project named '{folder_name}'");
+                        Environment.Exit(1);
+                    }
+                    Copy.CopyDirectory(preset_path, target_path);
+                    Console.WriteLine("Project created succesfully.");
+                    opener_command = @$"/C cd {target_path} && code .";
+                    Process.Start("cmd.exe", opener_command);
+                    Environment.Exit(0);
+                    break;
+            }
 
         }
         else if (args.Length == 2 && args[0] == "--projectpath") // Somwhere in the code it adds }" to and of the json file
