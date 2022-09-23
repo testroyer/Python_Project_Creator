@@ -63,6 +63,8 @@ Usage:
 
  - ppc --create-preset <presetpath> <presetname> -> Creates a project preset for later used named <projectname> under th ppc folder.
 
+ - ppc --use-preset <presetname> <foldername>? -> Creates a new project base to <projectpath> optionally named <foldername>
+
  - ppc --presets -> Displays the premade presets.
  
  - ppc --delete-preset <presetname> -> Deletes preset named <presetname>.
