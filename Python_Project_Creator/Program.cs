@@ -4,7 +4,7 @@ using System.Diagnostics;
 using CopySpace;
 
 
-string version = "1.10";
+string version = "1.10.1";
 
 string origin_project_path = "";
 string def_package_folder_name = "package";
@@ -164,31 +164,68 @@ if (args.Length > 0)
             Console.WriteLine($"Project path: {pyfolder}");
             Environment.Exit(0);
         }
-        else if (args.Length == 3 && args[0] == "--create-preset")
+        else if ((args.Length == 3 || args.Length == 2) && args[0] == "--create-preset")
         {
-            string directory_arg = args[1];
-            string target_arg = args[2];
-            string target_path = Path.Combine(preset_folder, target_arg);
-            if (Directory.Exists(target_path))
+            if (args.Length == 3)
             {
-                Console.WriteLine("A preset like that already exists.");
+
+                string directory_arg = args[1];
+                string target_arg = args[2];
+                string target_path = Path.Combine(preset_folder, target_arg);
+                if (Directory.Exists(target_path))
+                {
+                    Console.WriteLine("A preset like that already exists.");
+                    Environment.Exit(0);
+                
+                }
+
+                if (directory_arg.StartsWith("."))
+                {
+                    directory_arg = directory_arg.Substring(2);
+                    Copy.CopyDirectory(Path.Combine(currrent_directory, directory_arg), Path.Combine(preset_folder, target_arg));
+                }
+                else
+                {
+                    Copy.CopyDirectory(directory_arg, target_path);
+
+                }
+                Console.WriteLine($"The template '{target_arg}' has been created successfully");
                 Environment.Exit(0);
-            
+            }
+            else if (args.Length == 2)
+            {
+
+                string directory_arg = args[1];
+                string target_arg = "";
+                if (directory_arg.StartsWith("."))
+                {
+                    target_arg = directory_arg.Substring(2);
+                }else
+                {
+                    target_arg = directory_arg.Split("\\").ToList().ElementAt(directory_arg.Split("\\").ToList().Count() - 1);
+                }
+                string target_path = Path.Combine(preset_folder, target_arg);
+                if (Directory.Exists(target_path))
+                {
+                    Console.WriteLine("A preset like that already exists.");
+                    Environment.Exit(0);
+                
+                }
+
+                if (directory_arg.StartsWith("."))
+                {
+                    directory_arg = directory_arg.Substring(2);
+                    Copy.CopyDirectory(Path.Combine(currrent_directory, directory_arg), Path.Combine(preset_folder, target_arg));
+                }
+                else
+                {
+                    Copy.CopyDirectory(directory_arg, target_path);
+
+                }
+                Console.WriteLine($"The template '{target_arg}' has been created successfully");
+                Environment.Exit(0);
             }
 
-            if (directory_arg.StartsWith("."))
-            {
-                directory_arg = directory_arg.Substring(2);
-                Copy.CopyDirectory(Path.Combine(currrent_directory, directory_arg), Path.Combine(preset_folder, target_arg));
-            }
-            else
-            {
-                Copy.CopyDirectory(directory_arg, target_path);
-            }
-            
-
-            Console.WriteLine($"The template '{target_arg}' has been created successfully");
-            Environment.Exit(0);
 
         }
         else if (args.Length == 1 && args[0] == "--presets")
